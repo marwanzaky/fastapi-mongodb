@@ -3,10 +3,11 @@
 This repository serves as a starting point for building web applications with FastAPI and MongoDB. The project focuses on providing user authentication and signup functionalities out of the box, allowing developers to jumpstart their web projects seamlessly.
 
 ## 🚀 Features
-- FastAPI Integration: Harness the power of FastAPI, a modern, fast, web framework for building APIs with Python 3.12+.
-- MongoDB Support: Leverage MongoDB, a scalable and flexible NoSQL database, for efficient data storage and retrieval.
-- User Authentication: Implement secure user authentication mechanisms to ensure a protected user experience.
-- User Signup Logic: Streamline the user signup process with customizable logic to fit your application's requirements.
+- FastAPI: a modern, fast, web framework for building APIs.
+- MongoDB: a scalable and flexible NoSQL database.
+- User Authentication: secure user authentication.
+- Json Web Token (JWT): a secure protocol to exchange information between two entities.
+- Password encryption: hashing password coming from the user. 
 
 <div>
   <img src="https://img.shields.io/badge/-Python-2c3e50.svg?logo=python&style=flat">
