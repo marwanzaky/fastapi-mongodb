@@ -1,0 +1,62 @@
+<title>Welcome to the app</title>
+
+<link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+
+<body>
+    <header class="container">
+        <h1 class="h1">Welcome to the app</h1>
+    </header>
+
+    <main class="container">
+    
+        <form class="form" onsubmit="login(event)">
+            <label class="label" for="email">Email</label>
+            <input class="input" type="email" id="email" required>
+
+            <label class="label" for="password">Password</label>
+            <input class="input" type="password" id="password" required>
+
+            <div class="error" style="display: none;">Incorrect email or password.</div>
+            
+            <button class="btn-base w-full" type="submit">Login</button>
+        </form>
+        
+    </main>
+
+    <footer class="container">
+        <div class="signup">You don't have an account? <a href="/signup">Sign up</a></div>
+    </footer>
+</body>
+
+<script>
+   async function login(event) {
+        event.preventDefault();
+
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
+
+        const body = {
+            email: email,
+            password: password
+        }
+
+        const res = await fetch('/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (res.status === 200) {
+            const json = await res.json();
+
+            window.localStorage.setItem('token', json.access_token);
+            window.location.href = '/';
+        } else {
+            const formErrorElement = document.querySelector('.form .error');
+            
+            formErrorElement.style.display = 'block';
+        }
+    }
+</script>

@@ -1,0 +1,73 @@
+/* VARIABLES */
+:root {
+    --slate-200: #e2e8f0;
+    --slate-900: #0f172a;
+
+    --lime-200: #d9f99d;
+    --lime-500: #84cc16;
+}
+
+/* BASIC SETUP */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BASE */
+.container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0rem 1rem;
+}
+
+.label {
+    display: block;
+}
+
+.form {
+    margin-bottom: 2rem;
+}
+
+.input {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* BUTTON */
+.btn-base {
+    display: block;
+    width: 64px;
+
+    margin: 0rem;
+    margin-top: 1rem;
+}
+
+/* HEADERS */
+.h1 {
+    margin-bottom: 2rem;
+}
+
+.h2 {
+    margin-bottom: 1rem;
+}
+
+
+.form .error {
+    text-align: center;
+    color: red;
+}
+
+.form .success {
+    text-align: center;
+    color: green;
+}
+
+.signup {
+    text-align: center;
+}
+
+.w-full {
+    width: 100%;
+}

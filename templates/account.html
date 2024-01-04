@@ -1,0 +1,139 @@
+<title>Welcome to the app</title>
+
+<link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+
+<body>
+    <header class="container">
+        <h1 class="h1">Account</h1>
+    </header>
+    
+    <main class="container">
+        <!-- Profile -->
+        <h2 class="h2">Profile</h2>
+
+        <form id="profile-form" class="form" onsubmit="updateProfile(event)">
+            <label class="label" for="fname">Full name</label>
+            <input class="input" type="text" id="fname" required>
+
+            <label class="label" for="email">Email</label>
+            <input class="input" type="email" id="email" required>
+
+            <div class="success" style="display: none;">Successfully updated</div>
+            <div class="error" style="display: none;">Failed. Please try again</div>
+
+            <button class="btn-base w-full" type="submit">Submit</button>
+        </form>
+
+        <!-- Change password -->
+        <h2 class="h2">Change password</h2>
+        
+        <form class="form" onsubmit="login(event)">
+            <label class="label" for="password">Current</label>
+            <input class="input" type="password" id="password" required>
+
+            <label class="label" for="password">New</label>
+            <input class="input" type="password" id="password" required>
+
+            <label class="label" for="password">Confirm</label>
+            <input class="input" type="password" id="password" required>
+
+            <button class="btn-base w-full" type="submit">Submit</button>
+        </form>
+
+        <!-- Delete account -->
+        <h2 class="h2">Delete account</h2>
+        
+        <form class="form" onsubmit="deleteAccount(event)">
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+
+            <button class="btn-base w-full" type="submit">Delete account</button>
+        </form>
+    </main>
+
+    <footer class="container">
+        <a href="/">Home</a>
+    </footer>
+</body>
+
+<script>
+    (async function () {
+        const token = window.localStorage.getItem('token');
+
+        const options = {
+            method: "GET",
+            headers: new Headers({
+                'Authorization': `Bearer ${token}`, 
+                'Content-type': 'application/json',
+            }), 
+        };
+
+        const res = await fetch('/me', options);
+
+        if(res.status === 200) {
+            const json = await res.json();
+
+            setdata(json);
+        } else {
+            window.location.href = '/login';
+        }
+
+    })();
+
+    function setdata(data) {
+        const fnameElement = document.querySelector('#fname');
+        const emailElement = document.querySelector('#email');
+
+        fnameElement.value = data.fname;
+        emailElement.value = data.email;
+    }
+
+    async function updateProfile(event) {
+        event.preventDefault();
+
+        const fname = document.querySelector('#fname').value;
+        const email = document.querySelector('#email').value;
+
+        const body = { fname, email };
+
+        const token = window.localStorage.getItem('token');
+
+        const options = {
+            method: "PATCH",
+            headers: new Headers({
+                'Authorization': `Bearer ${token}`, 
+                'Content-type': 'application/json',
+            }),
+            body: JSON.stringify(body)
+        };
+
+        const res = await fetch('/me', options);
+
+        if(res.status === 200) {
+            const profileFormSuccessElement = document.querySelector('#profile-form').querySelector('.success');
+            profileFormSuccessElement.style.display = 'block';
+        } else {
+            const profileFormSuccessElement = document.querySelector('#profile-form').querySelector('.error');
+            profileFormSuccessElement.style.display = 'block';
+        }
+    }
+
+    async function deleteAccount(event) {
+        event.preventDefault();
+
+        const token = window.localStorage.getItem('token');
+
+        const options = {
+            method: "DELETE",
+            headers: new Headers({
+                'Authorization': `Bearer ${token}`, 
+                'Content-type': 'application/json',
+            })
+        };
+
+        const res = await fetch('/me', options);
+
+        if(res.status === 200)
+            window.localStorage.removeItem('token');
+            window.location.href = '/login';
+    }
+</script>

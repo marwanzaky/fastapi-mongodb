@@ -1,0 +1,58 @@
+<title>Welcome to the app</title>
+
+<link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+
+<body>
+    <header class="container">
+        <h1 class="h1">Welcome to the app</h1>
+    </header>
+
+    <main class="container">
+        <form class="form" onsubmit="login(event)">
+            <label class="label" for="fname">Full name</label>
+            <input class="input" type="text" id="fname" required>
+
+            <label class="label" for="email">Email</label>
+            <input class="input" type="email" id="email" required>
+
+            <label class="label" for="password">Password</label>
+            <input class="input" type="password" id="password" required>
+
+            <button class="btn-base w-full" type="submit">Sign up</button>
+        </form>
+    </main>
+
+    <footer class="container">
+        <div>You already have an account? <a href="/login">Sign in</a></div>
+    </footer>
+</body>
+
+<script>
+   async function login(event) {
+        event.preventDefault();
+
+        const fname = document.querySelector('#fname').value;
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
+
+        const body = {
+            fname: fname,
+            email: email,
+            password: password
+        }
+
+        const res = await fetch('/signup', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if(res.status === 201) {
+            window.location.href = '/login';
+        } else {
+            console.log(res.statusText);
+        }
+    }
+</script>
