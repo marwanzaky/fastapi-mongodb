@@ -19,6 +19,7 @@ def startup_db_client():
     app.mongodb_client = MongoClient(os.environ.get('MONGO_CLIENT_DB'), tls=True, tlsAllowInvalidCertificates=True)
     app.database = app.mongodb_client.app
     app.users_collection = app.database["users"]
+    app.users_collection.create_index("email", unique=True)
 
 @app.on_event("shutdown")
 def shutdown_db_client():

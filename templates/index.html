@@ -1,6 +1,6 @@
 <title>Welcome to the app</title>
 
-<link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
 
 <body>
     <main class="container">
@@ -12,7 +12,7 @@
             <li>
                 <a href="/login" onclick="logout()">Log out</a>
             </li>
-            
+
             <li>
                 <a href="/account">Account</a>
             </li>
@@ -20,33 +20,4 @@
     </footer>
 </body>
 
-<script>
-    (async function () {
-
-        const token = window.localStorage.getItem('token');
-
-        const options = {
-            method: "GET",
-            headers: new Headers({
-                'Authorization': `Bearer ${token}`, 
-                'Content-type': 'application/json',
-            }), 
-        };
-
-        const res = await fetch('/me', options);
-
-        if(res.status === 200) {
-            const json = await res.json();
-            const h1Element = document.querySelector('#h1');
-
-            h1Element.textContent = `Welcome, ${json.fname}`;
-        } else {
-            window.location.href = '/login';
-        }
-        
-    })();
-
-    function logout() {
-        window.localStorage.removeItem('token');
-    }
-</script>
+<script src="{{ url_for('static', path='js/templates/index.js') }}"></script>
