@@ -16,7 +16,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.on_event("startup")
 def startup_db_client():
-    app.mongodb_client = MongoClient(os.environ.get('MONGO_CLIENT_DB'), tls=True, tlsAllowInvalidCertificates=True)
+    mongo_client_db: str = os.environ.get('MONGO_CLIENT_DB')
+    
+    app.mongodb_client = MongoClient(mongo_client_db, tls=True, tlsAllowInvalidCertificates=True)
     app.database = app.mongodb_client.app
     app.users_collection = app.database["users"]
     app.users_collection.create_index("email", unique=True)

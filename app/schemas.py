@@ -1,5 +1,7 @@
 from typing import Literal, Optional, Any
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
+
+from datetime import datetime
 
 class ResponseModel(BaseModel):
     status: Literal['success', 'failed']
@@ -7,18 +9,21 @@ class ResponseModel(BaseModel):
     data: Any
     
 class LoginUser(BaseModel):
-    email: str
-    password: str
+    email: EmailStr
+    password: constr(min_length=8)
 
 class CreateUser(BaseModel):
-    fname: Optional[str]
+    role: Literal['user', 'admin'] = None
+    name: Optional[str]
     email: EmailStr
-    password: str
-    # created_at: datetime.datetime
+    password: constr(min_length=8)
+    password_confirm: str
+    created_at: datetime = None
+    verified: bool = None
 
 class UpdateUser(BaseModel):
-    fname: str
-    email: str
+    name: str
+    email: EmailStr
 
 class Token(BaseModel):
     access_token: str

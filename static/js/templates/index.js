@@ -15,7 +15,7 @@
         const json = await res.json();
         const h1Element = document.querySelector("#h1");
 
-        h1Element.textContent = `Welcome, ${json.data.user.fname}`;
+        h1Element.textContent = `Welcome, ${json.data.user.name}`;
     } else {
         window.location.href = "/login";
     }

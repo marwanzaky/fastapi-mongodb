@@ -2,34 +2,44 @@ from passlib.context import CryptContext;
 from fastapi import HTTPException, status
 from datetime import timedelta, datetime
 from jose import JWTError, jwt
+from pymongo.collection import Collection
 
 import os
 import app.schemas as schemas
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 
 def hash_pass(password: str) -> str:
     return pwd_context.hash(password)
 
-def verify_password(password, hashed_pass):
+def verify_password(password: str, hashed_pass: str) -> bool:
     return pwd_context.verify(password, hashed_pass)
 
 def create_access_token(data: dict) -> str:
-    token_expire_minutes = int(os.environ.get("TOKEN_EXPIRE_MINUTES"))
+    token_expire_minutes: str = os.environ.get("TOKEN_EXPIRE_MINUTES")
+    token_secret_key: str = os.environ.get("TOKEN_SECRET_KEY")
+    token_algorithm: str = os.environ.get("TOKEN_ALGORITHM")
+
+    token_expire_minutes_int: int = int(token_expire_minutes)
     
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=token_expire_minutes)
+    expire = datetime.utcnow() + timedelta(minutes=token_expire_minutes_int)
     to_encode.update({
         "expire": expire.strftime("%Y-%m-%d %H:%M:%S")
     })
 
-    encoded_jwt = jwt.encode(to_encode, os.environ.get("TOKEN_SECRET_KEY"), algorithm=os.environ.get("TOKEN_ALGORITHM"))
+    encoded_jwt = jwt.encode(to_encode, token_secret_key, algorithm=token_algorithm)
 
     return encoded_jwt
 
 def verify_token_access(token: str, credentials_exception: HTTPException) -> schemas.DataToken:
+    token_secret_key: str = os.environ.get("TOKEN_SECRET_KEY")
+    token_algorithm: str = os.environ.get("TOKEN_ALGORITHM")
+
     try:
-        payload: dict = jwt.decode(token, os.environ.get("TOKEN_SECRET_KEY"), algorithms=os.environ.get("TOKEN_ALGORITHM"))
+        payload: dict = jwt.decode(token, token_secret_key, algorithms=token_algorithm)
 
         id: str = payload.get("user_id")
 
@@ -43,7 +53,7 @@ def verify_token_access(token: str, credentials_exception: HTTPException) -> sch
     
     return token_data
 
-def get_current_user(token: str, users_collection) -> dict:
+def get_current_user(token: str, users_collection: Collection) -> dict:
     credentials_exception = HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
             detail= "Could not validate credentials",

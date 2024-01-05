@@ -7,6 +7,8 @@ from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
 from app.utils import verify_token_access, create_access_token, verify_password, hash_pass
 
+from datetime import datetime
+
 import app.schemas as schemas
 
 router = APIRouter()
@@ -48,7 +50,7 @@ async def me(request: Request, updateUser: schemas.UpdateUser) -> schemas.Respon
 
     users_collection.update_one(
         {"_id": ObjectId(dataToken.id)},
-        { "$set": { "fname": updateUser.fname, "email": updateUser.email } }
+        { "$set": { "name": updateUser.name, "email": updateUser.email } }
     )
     
     updated_user = users_collection.find_one(
@@ -99,9 +101,17 @@ async def create_user(request: Request, user: schemas.CreateUser) -> schemas.Res
     try:
         users_collection: Collection = request.app.users_collection
 
-        hashed_pass = hash_pass(user.password)
+        if user.password != user.password_confirm:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
 
+        del user.password_confirm
+        hashed_pass = hash_pass(user.password)
         user.password = hashed_pass
+
+        user.role = 'user'
+        user.created_at = datetime.utcnow()
+        user.verified = False
+
         user = jsonable_encoder(user)
 
         new_user = users_collection.insert_one(user)
@@ -112,4 +122,4 @@ async def create_user(request: Request, user: schemas.CreateUser) -> schemas.Res
 
         return schemas.ResponseModel(status="success", message="User successfully created", data={"user": created_user})
     except DuplicateKeyError:
-        return schemas.ResponseModel(status="failed", message="User with the same email already exists", data=None)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User with the same email already exists')
