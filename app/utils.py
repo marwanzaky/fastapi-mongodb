@@ -1,15 +1,14 @@
 from passlib.context import CryptContext;
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from datetime import timedelta, datetime
 from jose import JWTError, jwt
 from pymongo.collection import Collection
+from bson.objectid import ObjectId
 
 import os
 import app.schemas as schemas
 
 pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
 
 def hash_pass(password: str) -> str:
     return pwd_context.hash(password)
@@ -67,3 +66,31 @@ def get_current_user(token: str, users_collection: Collection) -> dict:
     )
 
     return user
+
+async def protect(request: Request):
+    token: str = None
+
+    users_collection: Collection = request.app.users_collection
+
+    credentials_exception = HTTPException(
+        status_code= status.HTTP_401_UNAUTHORIZED,
+        detail= "Could not validate credentials",
+        headers= {"WWW-Authenticate": "Bearer"}
+    )
+
+    if request.headers.get('authorization') and request.headers.get('authorization').startswith('Bearer'):
+        token: str = request.headers.get('authorization').split(' ')[1]
+
+    if token is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not logged in. Please log in to get access")
+
+    dataToken: schemas.DataToken = verify_token_access(token, credentials_exception)
+
+    user = users_collection.find_one(
+        {"_id": ObjectId(dataToken.id)},
+        {"_id": 0, "password": 0}
+    )
+
+    user["id"] = dataToken.id
+
+    request.app.user = user

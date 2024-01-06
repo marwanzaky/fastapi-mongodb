@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from pymongo import MongoClient
 
 from dotenv import load_dotenv
 
 from app.routers.users import router as users_router
 from app.routers.pages import router as pages_router
 
-from pymongo import MongoClient
 import os
 
 load_dotenv('./.env')
