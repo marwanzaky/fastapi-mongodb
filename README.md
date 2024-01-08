@@ -6,8 +6,9 @@ This repository serves as a starting point for building web applications with Fa
 - FastAPI: a modern, fast, web framework for building APIs.
 - MongoDB: a scalable and flexible NoSQL database.
 - User Authentication: secure user authentication.
+- User Profile Picture: uploading and updating user profile picture. 
 - Json Web Token (JWT): a secure protocol to exchange information between two entities.
-- Password encryption: hashing password coming from the user. 
+- Password encryption: hashing password coming from the user.
 
 <div>
   <img src="https://img.shields.io/badge/-Python-2c3e50.svg?logo=python&style=flat">
