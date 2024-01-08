@@ -8,8 +8,12 @@ from bson.objectid import ObjectId
 
 from datetime import datetime
 
+from typing import Annotated
+from fastapi import UploadFile, Form, File
+
 import app.utils as utils
 import app.schemas as schemas
+import bson.binary
 
 router = APIRouter()
 
@@ -67,19 +71,29 @@ router.dependencies=[Depends(utils.protect)]
 async def me(request: Request) -> schemas.ResponseModel:
     return schemas.ResponseModel(status='success', message="User successfully loaded", data={"user": request.app.user})
 
-@router.patch("/me", status_code=status.HTTP_200_OK, response_model=schemas.ResponseModel)
-async def update_me(request: Request, updateUser: schemas.UpdateUser) -> schemas.ResponseModel:
+@router.patch("/me", status_code=status.HTTP_200_OK)
+async def update_me(request: Request, name: Annotated[str, Form()], email: Annotated[str, Form()], picture: Annotated[UploadFile, File()]):
+    picture_contents = await picture.read()
+
     user: dict = request.app.user
     users_collection: Collection = request.app.users_collection
 
+    user_update = {
+        "name": name,
+        "email": email
+    }
+
+    if picture_contents:
+        user_update["picture"] = bson.binary.Binary(picture_contents)
+
     users_collection.update_one(
         {"_id": ObjectId(user["id"])},
-        { "$set": { "name": updateUser.name, "email": updateUser.email } }
+        { "$set": user_update }
     )
     
     updated_user: dict = users_collection.find_one(
         {"_id": ObjectId(user["id"])},
-        {"_id": 0, "password": 0}
+        {"_id": 0, "password": 0, "picture": 0}
     )
 
     return schemas.ResponseModel(status="success", message="User successfully updated", data={"user": updated_user})

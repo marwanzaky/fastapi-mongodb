@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 
 import os
 import app.schemas as schemas
+import base64
 
 pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -90,6 +91,9 @@ async def protect(request: Request):
         {"_id": ObjectId(dataToken.id)},
         {"_id": 0, "password": 0}
     )
+
+    if "picture" in user: 
+        user["picture"] = base64.b64encode(user["picture"])
 
     user["id"] = dataToken.id
 

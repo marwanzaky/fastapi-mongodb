@@ -54,6 +54,7 @@
 }
 
 
+/* FORM */
 .form .error {
     text-align: center;
     color: red;
@@ -64,6 +65,14 @@
     color: green;
 }
 
+.form .img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+/* OTHERS */
 .w-full {
     width: 100%;
 }

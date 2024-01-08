@@ -11,12 +11,17 @@
         <!-- Profile -->
         <h2 class="h2">Profile</h2>
 
-        <form id="profile-form" class="form" onsubmit="updateProfile(event)">
+        <form id="profileForm" class="form" onsubmit="updateProfile(event)">
+            <img class="img" id="img" src="{{ url_for('static', path='img/user.png') }}" alt="Profile image">
+
             <label class="label" for="name">Full name</label>
-            <input class="input" type="text" id="name" required />
+            <input class="input" type="text" id="name" name="name" required />
 
             <label class="label" for="email">Email</label>
-            <input class="input" type="email" id="email" required />
+            <input class="input" type="email" id="email" name="email" required />
+
+            <label class="label" for="picture">Picture</label>
+            <input class="input" type="file" id="picture" name="picture" accept="image/*">
 
             <div class="success" style="display: none">
                 Successfully updated
