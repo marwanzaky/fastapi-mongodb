@@ -9,7 +9,7 @@
         }),
     };
 
-    const res = await fetch("/me", options);
+    const res = await fetch("/users/me", options);
 
     if (res.status === 200) {
         const json = await res.json();

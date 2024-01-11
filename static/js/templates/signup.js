@@ -8,7 +8,7 @@ async function login(event) {
 
     const body = { name, email, password, "password_confirm": passwordConfirm };
 
-    const res = await fetch("/signup", {
+    const res = await fetch("/users/signup", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

@@ -11,7 +11,7 @@ async function init() {
         }),
     };
 
-    const res = await fetch('/me', options);
+    const res = await fetch('/users/me', options);
 
     if (res.status === 200) {
         const json = await res.json();
@@ -43,7 +43,7 @@ async function updateProfile(event) {
         body: new FormData(profileForm)
     };
 
-    const res = await fetch('/me', options);
+    const res = await fetch('/users/me', options);
 
     if (res.status === 200) {
         const profileFormSuccessElement = document.querySelector('#profileForm').querySelector('.success');
@@ -68,7 +68,7 @@ async function deleteAccount(event) {
         })
     };
 
-    const res = await fetch('/me', options);
+    const res = await fetch('/users/me', options);
 
     if (res.status === 200) {
         window.localStorage.removeItem('token');
