@@ -27,5 +27,5 @@ def startup_db_client():
 def shutdown_db_client():
     app.mongodb_client.close()
 
-app.include_router(users_router)
+app.include_router(users_router, prefix='/users')
 app.include_router(pages_router)

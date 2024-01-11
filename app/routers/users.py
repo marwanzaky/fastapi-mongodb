@@ -63,10 +63,9 @@ async def create_user(request: Request, user: schemas.CreateUser) -> schemas.Res
     except DuplicateKeyError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User with the same email already exists')
 
-# protected
+# --- PROTECTED ---
 router.dependencies=[Depends(utils.protect)]
 
-# /me
 @router.get("/me", status_code=status.HTTP_200_OK, response_model=schemas.ResponseModel)
 async def me(request: Request) -> schemas.ResponseModel:
     return schemas.ResponseModel(status='success', message="User successfully loaded", data={"user": request.app.user})
@@ -104,5 +103,67 @@ async def delete_me(request: Request):
     users_collection: Collection = request.app.users_collection
 
     users_collection.delete_one({"_id": ObjectId(user["id"])})
+
+    return None
+
+# --- PROTECTED & RESTRICTED ---
+router.dependencies=[Depends(utils.protect), Depends(utils.restrict_to(['admin']))]
+
+@router.get('/', status_code=status.HTTP_200_OK, response_model=schemas.ResponseModel)
+def get_all_users(request: Request) -> schemas.ResponseModel:
+    users_collection: Collection = request.app.users_collection
+    users = users_collection.find({})
+
+    users = [schemas.User(id=str(user['_id']), **user) for user in users]
+
+    return schemas.ResponseModel(status="success", message="All users successfully loaded", data={"users": users})
+
+@router.get('/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.ResponseModel)
+def get_user(request: Request, user_id: str) -> schemas.ResponseModel:
+    try:
+        users_collection: Collection = request.app.users_collection
+
+        user = users_collection.find_one( {"_id": ObjectId(user_id)})
+
+        user = schemas.User(id=str(user['_id']), **user)
+
+        return schemas.ResponseModel(status="success", message="All users successfully loaded", data={"user": user})
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid user ID')
+    
+
+@router.patch('/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.ResponseModel)
+async def update_user(request: Request, user_id: str, name: Annotated[str, Form()], email: Annotated[str, Form()], picture: Annotated[UploadFile, File()]):
+    picture_contents = await picture.read()
+
+    users_collection: Collection = request.app.users_collection
+    user = users_collection.find_one( {"_id": ObjectId(user_id)})
+    
+    user_update = {
+        "name": name,
+        "email": email
+    }
+
+    if picture_contents:
+        user_update["picture"] = bson.binary.Binary(picture_contents)
+
+    users_collection.update_one(
+        {"_id": user["_id"]},
+        { "$set": user_update }
+    )
+    
+    updated_user: dict = users_collection.find_one(
+        {"_id": user["_id"]},
+        {"_id": 0, "password": 0, "picture": 0}
+    )
+
+    return schemas.ResponseModel(status="success", message="User successfully updated", data={"user": updated_user})
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(request: Request, user_id: str):
+    users_collection: Collection = request.app.users_collection
+    user = users_collection.find_one( {"_id": ObjectId(user_id)})
+
+    users_collection.delete_one({"_id": user["_id"]})
 
     return None

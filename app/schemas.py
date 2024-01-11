@@ -3,11 +3,19 @@ from pydantic import BaseModel, EmailStr, constr
 
 from datetime import datetime
 
+class User(BaseModel):
+    role: str
+    id: str
+    name: str
+    email: str
+    created_at: datetime
+    verified: bool
+
 class ResponseModel(BaseModel):
     status: Literal['success', 'failed']
     message: str
     data: Any
-    
+
 class LoginUser(BaseModel):
     email: EmailStr
     password: constr(min_length=8)
